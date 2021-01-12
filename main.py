@@ -11,6 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 from SED import ED
+import pyperclip
 
 class GlobalData:
         sedObj = ED()
@@ -382,6 +383,12 @@ class Ui_MainWindow(object):
         self.encryptButton.pressed.connect(self.encryptButtonPress)
         self.encryptButton.released.connect(self.encryptButtonPressR)
 
+        self.decryptButton.pressed.connect(self.decryptButtonPress)
+        self.decryptButton.released.connect(self.decryptButtonPressR)
+
+        self.encryptButton_3.pressed.connect(self.copyToClipboard)
+        self.encryptButton_3.released.connect(self.copyToClipboardR)
+
 
 
 
@@ -431,6 +438,30 @@ class Ui_MainWindow(object):
 
 
 
+    def copyToClipboard(self):
+        self.encryptButton_3.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(185, 185, 185);")
+        pyperclip.copy(self.textBrowser.toPlainText())
+        pyperclip.paste()
+        self.encryptButton_3.setText("Copied!")
+
+    def copyToClipboardR(self):
+        time.sleep(0.75)
+        self.encryptButton_3.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(0, 170, 0);")
+        self.encryptButton_3.setText("Copy!")
+
+
 
 
 
@@ -467,6 +498,45 @@ class Ui_MainWindow(object):
 "color: rgb(255, 255, 255);\n"
 "font: 87 14pt \"Arial Black\";\n"
 "background-color: rgb(255, 0, 0);")
+
+
+
+
+
+
+
+
+
+
+    def decryptButtonPress(self):
+        self.decryptButton.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(185, 185, 185);")
+
+        if(len(self.PinInput.text()) == 0):
+                GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+        else:
+                GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                
+        decText = GlobalData.sedObj.decrypter(self.textEdit.toPlainText())
+
+        self.textBrowser.clear()
+        self.textBrowser.setPlainText(decText)
+
+
+    def decryptButtonPressR(self):
+        time.sleep(0.1)
+        self.decryptButton.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(0, 0, 255);")
 
 
 
