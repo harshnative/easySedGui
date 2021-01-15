@@ -10,7 +10,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
-from SED import ED
+from SED import ED, GlobalMethods
 import pyperclip
 from tkinter import filedialog
 from tkinter import *
@@ -423,11 +423,42 @@ class Ui_MainWindow(object):
 
 
     def validateFileFunc(self):
-        pass
+        self.validateFile.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        filePathInputted = self.pathInputFile.text()
+        destPathInputted = self.destInputFile.text()
+
+        self.textBrowserFile.clear()
+
+        if(not(os.path.isfile(filePathInputted))):
+                self.textBrowserFile.setText("File path given is incorrect")
+                self.textBrowserFile.append("\nRemember you don't have to press validate if you have already selected the path from buttons above")
+                return
+
+        
+        if(not(os.path.isdir(destPathInputted))):
+                self.textBrowserFile.setText("Dest path given is incorrect")
+                self.textBrowserFile.append("\nRemember you don't have to press validate if you have already selected the path from buttons above")
+                return
+
+        GlobalData.file_filePath = (filePathInputted)
+        GlobalData.file_destPath = (destPathInputted)
+        self.textBrowserFile.append("Paths validated...\n\nReady for encryption or decryption")
 
 
     def validateFileFuncR(self):
-        pass
+        time.sleep(0.5)
+        self.validateFile.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(0, 170, 0);")
 
 
 
@@ -739,6 +770,9 @@ class Ui_MainWindow(object):
 "border-width: 2px;\n"
 "padding: 16px;")
 
+        GlobalData.file_filePath = None 
+        GlobalData.file_destPath = None
+
 
 
 
@@ -784,6 +818,9 @@ class Ui_MainWindow(object):
         self.textBrowserFile.clear()
         self.textBrowserFile.setPlainText("Choose the path to the file and destination")
 
+        GlobalData.file_filePath = None 
+        GlobalData.file_destPath = None
+
     
 
 
@@ -822,6 +859,9 @@ class Ui_MainWindow(object):
 "border-color: rgb(0, 0, 0);\n"
 "border-width: 2px;\n"
 "padding: 16px;")
+
+        GlobalData.file_filePath = None 
+        GlobalData.file_destPath = None
 
 
 
