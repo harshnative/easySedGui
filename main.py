@@ -411,6 +411,9 @@ class Ui_MainWindow(object):
         self.encryptButton_4.pressed.connect(self.encryptFilePressed)
         self.encryptButton_4.released.connect(self.encryptFilePressedR)
 
+        self.decryptButton_3.pressed.connect(self.decryptFilePressed)
+        self.decryptButton_3.released.connect(self.decryptFilePressedR)
+
 
 
 
@@ -492,6 +495,100 @@ class Ui_MainWindow(object):
 "color: rgb(255, 255, 255);\n"
 "font: 87 14pt \"Arial Black\";\n"
 "background-color: rgb(255, 0, 0);")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def decryptFilePressed(self):
+        self.decryptButton_3.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFile.clear()
+
+        if((GlobalData.file_filePath == None) or (len(GlobalData.file_filePath) == 0)):
+                self.textBrowserFile.append("Choose the file or enter the file path manually first")
+                return
+        
+        if(GlobalData.file_destPath == None):
+                self.textBrowserFile.append("Choose the path to destination i.e were the file will be exported")
+                return
+
+
+        lenFiles = str(len(GlobalData.file_filePath))
+
+        if(len(self.PinInput.text()) == 0):
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                except Exception as e:
+                        self.textBrowserFile.clear()
+                        self.textBrowserFile.setPlainText("password input error: " + str(e))
+                        return
+        else:
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                except Exception as e:
+                        self.textBrowserFile.clear()
+                        self.textBrowserFile.setPlainText("password input error: " + str(e))
+                        return
+
+        self.textBrowserFile.setText("Decrypting , please wait ... , program may be unresponsive for some time\n")
+        QtCore.QCoreApplication.processEvents()
+        time.sleep(1)
+
+
+        for k,i in enumerate(GlobalData.file_filePath):
+                try:
+                        self.textBrowserFile.setText("Decrypting , please wait ... , program may be unresponsive for some time\n\nDone({}/{})".format(str(k) , lenFiles))
+                        QtCore.QCoreApplication.processEvents()
+                        
+                        for j in GlobalData.sedObj.decryptFile(i , GlobalData.file_destPath):
+                                pass
+                except Exception as e:
+                        self.textBrowserFile.setText("Decryption Error: ".format(str(e)))
+
+
+        self.textBrowserFile.setText("Decryption Done. Check the path {} for encryted files".format(GlobalData.file_destPath))
+        
+
+                
+
+
+
+
+    def decryptFilePressedR(self):
+        time.sleep(0.5)
+        self.decryptButton_3.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"background-color: rgb(0, 0, 255);\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";")
+
+
+
+
+
+
+
+
 
 
 
