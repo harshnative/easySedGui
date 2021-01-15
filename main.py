@@ -342,6 +342,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.textBrowserFolder.setStyleSheet("font: 14pt \"MS Shell Dlg 2\";\n")
 
 
 
@@ -416,6 +417,351 @@ class Ui_MainWindow(object):
 
 
 
+        # folder page button
+        self.selectFileFile_2.pressed.connect(self.fileSelect2)
+        self.selectFileFile_2.released.connect(self.fileSelectR2)
+
+        self.selectDestFile_2.pressed.connect(self.fileDestSelect2)
+        self.selectDestFile_2.released.connect(self.fileDestSelectR2)
+
+        self.validateFile_2.pressed.connect(self.validateFileFunc2)
+        self.validateFile_2.released.connect(self.validateFileFuncR2)
+
+        self.encryptButton_5.pressed.connect(self.encryptFilePressed2)
+        self.encryptButton_5.released.connect(self.encryptFilePressedR2)
+
+        self.decryptButton_4.pressed.connect(self.decryptFilePressed2)
+        self.decryptButton_4.released.connect(self.decryptFilePressedR2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def encryptFilePressed2(self):
+        self.encryptButton_5.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFolder.clear()
+
+        if((GlobalData.file_filePath == None) or (len(GlobalData.file_filePath) == 0)):
+                self.textBrowserFolder.append("Choose the file or enter the folder path manually first")
+                return
+        
+        if(GlobalData.file_destPath == None):
+                self.textBrowserFolder.append("Choose the path to destination i.e were the encrypted folder will be exported")
+                return
+
+
+        if(len(self.PinInput.text()) == 0):
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                except Exception as e:
+                        self.textBrowserFolder.clear()
+                        self.textBrowserFolder.setPlainText("password input error: " + str(e))
+                        return
+        else:
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                except Exception as e:
+                        self.textBrowserFolder.clear()
+                        self.textBrowserFolder.setPlainText("password input error: " + str(e))
+                        return
+
+        self.textBrowserFolder.setText("Encrypting , please wait ... , program may be unresponsive for some time\n")
+        QtCore.QCoreApplication.processEvents()
+        time.sleep(1)
+
+
+        for i in GlobalData.sedObj.encryptDir(GlobalData.file_filePath , GlobalData.file_destPath):
+                
+                try:
+                        self.textBrowserFolder.setText("Encrypting , please wait ... , program may be unresponsive for some time\n\nFiles Left ({})".format(str(i)))
+                        QtCore.QCoreApplication.processEvents()
+                except Exception as e:
+                        self.textBrowserFolder.setText("Encryption Error: ".format(str(e)))
+
+
+        self.textBrowserFolder.setText("Encryption Done. Check the path {} for encryted folder".format(GlobalData.file_destPath))
+        
+
+        GlobalData.file_filePath = None 
+        GlobalData.file_destPath = None
+
+
+
+
+    def encryptFilePressedR2(self):
+        time.sleep(0.5)
+        self.encryptButton_5.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(255, 0, 0);")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def decryptFilePressed2(self):
+        self.decryptButton_4.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFolder.clear()
+
+        if((GlobalData.file_filePath == None) or (len(GlobalData.file_filePath) == 0)):
+                self.textBrowserFolder.append("Choose the folder or enter the folder path manually first")
+                return
+        
+        if(GlobalData.file_destPath == None):
+                self.textBrowserFolder.append("Choose the path to destination i.e were the file will be exported")
+                return
+
+
+
+        if(len(self.PinInput.text()) == 0):
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                except Exception as e:
+                        self.textBrowserFolder.clear()
+                        self.textBrowserFolder.setPlainText("password input error: " + str(e))
+                        return
+        else:
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                except Exception as e:
+                        self.textBrowserFolder.clear()
+                        self.textBrowserFolder.setPlainText("password input error: " + str(e))
+                        return
+
+        self.textBrowserFolder.setText("Decrypting , please wait ... , program may be unresponsive for some time\n")
+        QtCore.QCoreApplication.processEvents()
+        time.sleep(1)
+
+        for i in GlobalData.sedObj.decryptDir(GlobalData.file_filePath , GlobalData.file_destPath):
+                try:
+                        self.textBrowserFolder.setText("Decrypting , please wait ... , program may be unresponsive for some time\n\nFiles Left ({})".format(str(i)))
+                        QtCore.QCoreApplication.processEvents()
+                except Exception as e:
+                        self.textBrowserFolder.setText("Decryption Error: ".format(str(e)))
+
+
+        self.textBrowserFolder.setText("Decryption Done. Check the path {} for decryted folder".format(GlobalData.file_destPath))
+        
+
+        GlobalData.file_filePath = None 
+        GlobalData.file_destPath = None    
+
+
+
+
+    def decryptFilePressedR2(self):
+        time.sleep(0.5)
+        self.decryptButton_4.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"background-color: rgb(0, 0, 255);\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def validateFileFunc2(self):
+        self.validateFile_2.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        filePathInputted = self.pathInputFile_2.text()
+        destPathInputted = self.destInputFile_2.text()
+
+        self.textBrowserFolder.clear()
+
+        if(not(os.path.isdir(filePathInputted))):
+                self.textBrowserFolder.setText("Folder path given is incorrect")
+                self.textBrowserFolder.append("\nRemember you don't have to press validate if you have already selected the path from buttons above")
+                return
+
+        
+        if(not(os.path.isdir(destPathInputted))):
+                self.textBrowserFolder.setText("Dest path given is incorrect")
+                self.textBrowserFolder.append("\nRemember you don't have to press validate if you have already selected the path from buttons above")
+                return
+
+        GlobalData.file_filePath = filePathInputted
+        GlobalData.file_destPath = destPathInputted
+        self.textBrowserFolder.append("Paths validated...\n\nReady for encryption or decryption")
+
+
+    def validateFileFuncR2(self):
+        time.sleep(0.5)
+        self.validateFile_2.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(0, 170, 0);")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def fileSelect2(self):
+        self.selectFileFile_2.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFolder.clear()
+        self.textBrowserFolder.append("Select folder from file explorer opened")
+        root = Tk()
+        filePath = filedialog.askdirectory()
+        root.destroy()
+        self.textBrowserFolder.append("\nFolder added successfully")
+        GlobalData.file_filePath = filePath
+        if(GlobalData.file_destPath == None):
+                self.textBrowserFolder.append("\nNow select the path to destination by clicking on destination path button")
+        else:
+                self.textBrowserFolder.append("\nReady for encryption or decryption")
+
+
+        
+
+
+
+    def fileSelectR2(self):
+            self.selectFileFile_2.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(85, 0, 255);")
+
+
+
+
+
+
+
+
+
+
+
+    def fileDestSelect2(self):
+        self.selectDestFile_2.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFolder.clear()
+        self.textBrowserFolder.append("Select destination path from file explorer opened")
+        root = Tk()
+        filePath = filedialog.askdirectory()
+        root.destroy()
+        try:
+                self.textBrowserFolder.append("\nEncrypted folder will be exported to " + str(filePath))
+                GlobalData.file_destPath = filePath
+        except Exception:
+                self.textBrowserFolder.append("\nCould not load the destination path try again..")
+                return 
+                
+        if(GlobalData.file_filePath == None):
+                self.textBrowserFolder.append("\nNow select the folder to be encrypted by clicking on folder path button")
+        else:
+                self.textBrowserFolder.append("\nReady for encryption or decryption")
+
+
+        
+
+
+
+    def fileDestSelectR2(self):
+            self.selectDestFile_2.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(85, 0, 255);")
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -480,7 +826,8 @@ class Ui_MainWindow(object):
 
         self.textBrowserFile.setText("Encryption Done. Check the path {} for encryted files".format(GlobalData.file_destPath))
         
-
+        GlobalData.file_filePath = None 
+        GlobalData.file_destPath = None
                 
 
 
@@ -564,9 +911,10 @@ class Ui_MainWindow(object):
                         self.textBrowserFile.setText("Decryption Error: ".format(str(e)))
 
 
-        self.textBrowserFile.setText("Decryption Done. Check the path {} for encryted files".format(GlobalData.file_destPath))
+        self.textBrowserFile.setText("Decryption Done. Check the path {} for decryted files".format(GlobalData.file_destPath))
         
-
+        GlobalData.file_filePath = None 
+        GlobalData.file_destPath = None
                 
 
 
@@ -581,6 +929,7 @@ class Ui_MainWindow(object):
 "background-color: rgb(0, 0, 255);\n"
 "color: rgb(255, 255, 255);\n"
 "font: 87 14pt \"Arial Black\";")
+
 
 
 
@@ -1038,6 +1387,10 @@ class Ui_MainWindow(object):
 "border-color: rgb(0, 0, 0);\n"
 "border-width: 2px;\n"
 "padding: 16px;")
+
+
+        self.textBrowserFolder.clear()
+        self.textBrowserFolder.setPlainText("Choose the path to the Folder and destination")
 
         GlobalData.file_filePath = None 
         GlobalData.file_destPath = None
