@@ -402,16 +402,96 @@ class Ui_MainWindow(object):
         self.selectFileFile.pressed.connect(self.fileSelect)
         self.selectFileFile.released.connect(self.fileSelectR)
 
-        self.selectFileFile.pressed.connect(self.fileDestSelect)
-        self.selectFileFile.released.connect(self.fileDestSelectR)
+        self.selectDestFile.pressed.connect(self.fileDestSelect)
+        self.selectDestFile.released.connect(self.fileDestSelectR)
 
         self.validateFile.pressed.connect(self.validateFileFunc)
         self.validateFile.released.connect(self.validateFileFuncR)
 
+        self.encryptButton_4.pressed.connect(self.encryptFilePressed)
+        self.encryptButton_4.released.connect(self.encryptFilePressedR)
 
 
 
 
+
+
+
+
+    
+
+
+
+    def encryptFilePressed(self):
+        self.encryptButton_4.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFile.clear()
+
+        if((GlobalData.file_filePath == None) or (len(GlobalData.file_filePath) == 0)):
+                self.textBrowserFile.append("Choose the file or enter the file path manually first")
+                return
+        
+        if(GlobalData.file_destPath == None):
+                self.textBrowserFile.append("Choose the path to destination i.e were the file will be exported")
+                return
+
+
+        lenFiles = str(len(GlobalData.file_filePath))
+
+        if(len(self.PinInput.text()) == 0):
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                except Exception as e:
+                        self.textBrowserFile.clear()
+                        self.textBrowserFile.setPlainText("password input error: " + str(e))
+                        return
+        else:
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                except Exception as e:
+                        self.textBrowserFile.clear()
+                        self.textBrowserFile.setPlainText("password input error: " + str(e))
+                        return
+
+        self.textBrowserFile.setText("Encrypting , please wait ... , program may be unresponsive for some time\n")
+        QtCore.QCoreApplication.processEvents()
+        time.sleep(1)
+
+
+        for k,i in enumerate(GlobalData.file_filePath):
+                try:
+                        self.textBrowserFile.setText("Encrypting , please wait ... , program may be unresponsive for some time\n\nDone({}/{})".format(str(k) , lenFiles))
+                        QtCore.QCoreApplication.processEvents()
+                        
+                        for j in GlobalData.sedObj.encryptFile(i , GlobalData.file_destPath):
+                                pass
+                except Exception as e:
+                        self.textBrowserFile.setText("Encryption Error: ".format(str(e)))
+
+
+        self.textBrowserFile.setText("Encryption Done. Check the path {} for encryted files".format(GlobalData.file_destPath))
+        
+
+                
+
+
+
+
+    def encryptFilePressedR(self):
+        time.sleep(0.5)
+        self.encryptButton_4.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(255, 0, 0);")
 
 
 
@@ -486,10 +566,10 @@ class Ui_MainWindow(object):
         self.textBrowserFile.append("Select files from file explorer opened")
         root = Tk()
         filePath = filedialog.askopenfilenames()
+        root.destroy()
         self.textBrowserFile.append("\nFiles added for encrption = " + str(len(filePath)))
         if(len(filePath) != 0):
                 GlobalData.file_filePath = filePath
-        root.destroy()
         if(GlobalData.file_destPath == None):
                 self.textBrowserFile.append("\nNow select the path to destination by clicking on destination path button")
         else:
@@ -532,12 +612,14 @@ class Ui_MainWindow(object):
         self.textBrowserFile.append("Select destination path from file explorer opened")
         root = Tk()
         filePath = filedialog.askdirectory()
+        root.destroy()
         try:
-                self.textBrowserFile.append("\nfiles will be exported to " + str(filePath[0]))
+                self.textBrowserFile.append("\nfiles will be exported to " + str(filePath))
                 GlobalData.file_destPath = filePath
         except Exception:
                 self.textBrowserFile.append("\nCould not load the destination path try again..")
-        root.destroy()
+                return 
+                
         if(GlobalData.file_filePath == None):
                 self.textBrowserFile.append("\nNow select the path to file by clicking on file path button")
         else:

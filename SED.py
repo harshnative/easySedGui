@@ -359,6 +359,8 @@ class ED:
             if(self.isOnWindows):
                 if((i == "\\")):
                     break
+                if((i == "/")):
+                    break
                 else:
                     fileName = fileName + i
             else:
@@ -503,6 +505,7 @@ class ED:
                 os.makedirs(folderToBeGenerated)
             except FileExistsError:
                 pass
+
             
             # encryting the file
             for i in self.encryptFile(source , folderToBeGenerated):
