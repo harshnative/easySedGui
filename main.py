@@ -12,9 +12,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 from SED import ED
 import pyperclip
+from tkinter import filedialog
+from tkinter import *
 
 class GlobalData:
         sedObj = ED()
+        file_filePath = None
+        file_destPath = None
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -246,6 +250,7 @@ class Ui_MainWindow(object):
 "font: 87 14pt \"Arial Black\";")
         self.decryptButton_3.setObjectName("decryptButton_3")
         self.stackedWidget.addWidget(self.FilePage)
+        self.textBrowserFile.setStyleSheet("font: 14pt \"MS Shell Dlg 2\";\n")
 
 
 
@@ -393,6 +398,133 @@ class Ui_MainWindow(object):
 
 
 
+        # file page button
+        self.selectFileFile.pressed.connect(self.fileSelect)
+        self.selectFileFile.released.connect(self.fileSelectR)
+
+        self.selectFileFile.pressed.connect(self.fileDestSelect)
+        self.selectFileFile.released.connect(self.fileDestSelectR)
+
+        self.validateFile.pressed.connect(self.validateFileFunc)
+        self.validateFile.released.connect(self.validateFileFuncR)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def validateFileFunc(self):
+        pass
+
+
+    def validateFileFuncR(self):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def fileSelect(self):
+        self.selectFileFile.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFile.clear()
+        self.textBrowserFile.append("Select files from file explorer opened")
+        root = Tk()
+        filePath = filedialog.askopenfilenames()
+        self.textBrowserFile.append("\nFiles added for encrption = " + str(len(filePath)))
+        if(len(filePath) != 0):
+                GlobalData.file_filePath = filePath
+        root.destroy()
+        if(GlobalData.file_destPath == None):
+                self.textBrowserFile.append("\nNow select the path to destination by clicking on destination path button")
+        else:
+                self.textBrowserFile.append("\nReady for encryption or decryption")
+
+
+        
+
+
+
+    def fileSelectR(self):
+            self.selectFileFile.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(85, 0, 255);")
+
+
+
+
+
+
+
+
+
+
+
+    def fileDestSelect(self):
+        self.selectDestFile.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(0, 0, 0);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(197, 197, 197);")
+
+        self.textBrowserFile.clear()
+        self.textBrowserFile.append("Select destination path from file explorer opened")
+        root = Tk()
+        filePath = filedialog.askdirectory()
+        try:
+                self.textBrowserFile.append("\nfiles will be exported to " + str(filePath[0]))
+                GlobalData.file_destPath = filePath
+        except Exception:
+                self.textBrowserFile.append("\nCould not load the destination path try again..")
+        root.destroy()
+        if(GlobalData.file_filePath == None):
+                self.textBrowserFile.append("\nNow select the path to file by clicking on file path button")
+        else:
+                self.textBrowserFile.append("\nReady for encryption or decryption")
+
+
+        
+
+
+
+    def fileDestSelectR(self):
+            self.selectDestFile.setStyleSheet("border-color: rgb(0, 0, 0);\n"
+"border-style: solid;\n"
+"border-width: 2px;\n"
+"padding: 16px;\n"
+"color: rgb(255, 255, 255);\n"
+"font: 87 14pt \"Arial Black\";\n"
+"background-color: rgb(85, 0, 255);")
 
 
 
@@ -459,7 +591,7 @@ class Ui_MainWindow(object):
 "color: rgb(255, 255, 255);\n"
 "font: 87 14pt \"Arial Black\";\n"
 "background-color: rgb(0, 170, 0);")
-        self.encryptButton_3.setText("Copy!")
+        self.encryptButton_3.setText("Copy")
 
 
 
@@ -479,14 +611,28 @@ class Ui_MainWindow(object):
 "background-color: rgb(185, 185, 185);")
 
         if(len(self.PinInput.text()) == 0):
-                GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                except Exception as e:
+                        self.textBrowser.clear()
+                        self.textBrowser.setPlainText("password input error: " + str(e))
+                        return
         else:
-                GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                except Exception as e:
+                        self.textBrowser.clear()
+                        self.textBrowser.setPlainText("password input error: " + str(e))
+                        return
                 
-        encText = GlobalData.sedObj.encrypter(self.textEdit.toPlainText())
-
-        self.textBrowser.clear()
-        self.textBrowser.setPlainText(encText)
+        try:
+                encText = GlobalData.sedObj.encrypter(self.textEdit.toPlainText())
+                self.textBrowser.clear()
+                self.textBrowser.setPlainText(encText)
+        except Exception as e:
+                self.textBrowser.clear()
+                self.textBrowser.setPlainText("Could not encrypt. Error: " + str(e))
+                
 
 
     def encryptButtonPressR(self):
@@ -518,15 +664,27 @@ class Ui_MainWindow(object):
 "background-color: rgb(185, 185, 185);")
 
         if(len(self.PinInput.text()) == 0):
-                GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , "123456")
+                except Exception as e:
+                        self.textBrowser.clear()
+                        self.textBrowser.setPlainText("password input error: " + str(e))
+                        return
         else:
-                GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
-                
-        decText = GlobalData.sedObj.decrypter(self.textEdit.toPlainText())
+                try:
+                        GlobalData.sedObj.setPassword_Pin(self.passwordInput.text() , self.PinInput.text())
+                except Exception as e:
+                        self.textBrowser.clear()
+                        self.textBrowser.setPlainText("password input error: " + str(e))
+                        return 
 
-        self.textBrowser.clear()
-        self.textBrowser.setPlainText(decText)
-
+        try:                
+                decText = GlobalData.sedObj.decrypter(self.textEdit.toPlainText())
+                self.textBrowser.clear()
+                self.textBrowser.setPlainText(decText)
+        except Exception as e:
+                self.textBrowser.clear()
+                self.textBrowser.setPlainText("Could not decrypt. Error: " + str(e))
 
     def decryptButtonPressR(self):
         time.sleep(0.1)
@@ -622,6 +780,9 @@ class Ui_MainWindow(object):
 "border-color: rgb(0, 0, 0);\n"
 "border-width: 2px;\n"
 "padding: 16px;")
+
+        self.textBrowserFile.clear()
+        self.textBrowserFile.setPlainText("Choose the path to the file and destination")
 
     
 
