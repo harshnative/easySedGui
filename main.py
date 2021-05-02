@@ -10,7 +10,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
-from SED import ED, GlobalMethods
+from SED import ED
 import pyperclip
 from tkinter import filedialog
 from tkinter import *
